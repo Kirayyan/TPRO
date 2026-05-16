@@ -8,12 +8,42 @@
 pip install -r requirements.txt
 ```
 
-## 一条命令完成测试
+## AutoDL / project_v2 数据路径（你的场景）
 
-将路径换成你服务器上的实际文件（与 MST-OATD `generate_outliers.py` 输出一致）：
+数据目录：`/autodl-tmp/opensource_release_20260511/src/project_v2/data/porto`
+
+异常文件形如 `outliers_data_1_stay_0p3_10_1.npy`，标签为同名 `outliers_idx_1_stay_0p3_10_1.npy`。
+
+**单个文件评测：**
 
 ```bash
-python -m tpro_baseline.run_test \
+cd /path/to/TPRO
+pip install -r requirements.txt
+
+python3 -m tpro_baseline.run_test \
+  --train  /autodl-tmp/opensource_release_20260511/src/project_v2/data/porto/train_data_init.npy \
+  --test   /autodl-tmp/opensource_release_20260511/src/project_v2/data/porto/outliers_data_1_stay_0p3_10_1.npy \
+  --labels /autodl-tmp/opensource_release_20260511/src/project_v2/data/porto/outliers_idx_1_stay_0p3_10_1.npy \
+  --map_dir TPRO/map \
+  --train_cache .tpro_cache/train.pkl \
+  --test_cache  .tpro_cache/outliers_data_1_stay_0p3_10_1.pkl
+```
+
+**批量评测目录下全部 `outliers_data_*.npy`：**
+
+```bash
+python3 -m tpro_baseline.run_test_batch \
+  --data_dir /autodl-tmp/opensource_release_20260511/src/project_v2/data/porto \
+  --train train_data_init.npy \
+  --map_dir TPRO/map
+```
+
+或：`bash scripts/run_tpro_porto.sh`
+
+## 一条命令完成测试（MST-OATD 默认命名）
+
+```bash
+python3 -m tpro_baseline.run_test \
   --train  /你的路径/data/porto/train_data_init.npy \
   --test   /你的路径/data/porto/outliers_data_init_2_0.2_1.0.npy \
   --labels /你的路径/data/porto/outliers_idx_init_2_0.2_1.0.npy \
