@@ -17,6 +17,45 @@ def labels_path_for_test(test_path: Path) -> Path:
   raise ValueError(f"cannot infer label file from {test_path}")
 
 
+def resolve_train_path(data_dir: Path, train_arg: str, test_files: list[Path]) -> Path:
+  """Find train npy: explicit name, then train_data_{id} from outliers, then any train*.npy."""
+  explicit = data_dir / train_arg
+  if explicit.exists():
+    return explicit
+
+  candidates = sorted(data_dir.glob("train*.npy"))
+  if not candidates:
+    candidates = sorted(data_dir.glob("**/train*.npy"))
+
+  # e.g. outliers_data_1_stay_... -> train_data_1.npy
+  if test_files:
+    first = test_files[0].name
+    parts = first.split("_")
+    if len(parts) >= 3 and parts[0] == "outliers" and parts[1] == "data":
+      split_id = parts[2]
+      for name in (f"train_data_{split_id}.npy", f"train_{split_id}.npy"):
+        cand = data_dir / name
+        if cand.exists():
+          print(f"[train] matched split {split_id} -> {cand.name}")
+          return cand
+
+  for name in ("train_data_init.npy", "train_data_1.npy", "train.npy"):
+    cand = data_dir / name
+    if cand.exists():
+      print(f"[train] using {cand.name}")
+      return cand
+
+  if len(candidates) == 1:
+    print(f"[train] using only train*.npy: {candidates[0].name}")
+    return candidates[0]
+
+  if candidates:
+    print(f"[train] using largest train*.npy: {candidates[-1].name}")
+    return candidates[-1]
+
+  return explicit
+
+
 def main() -> int:
   p = argparse.ArgumentParser(description="Batch TPRO eval on porto outlier npy files")
   p.add_argument("--data_dir", required=True)

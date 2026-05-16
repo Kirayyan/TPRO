@@ -37,11 +37,16 @@ python3 -m tpro_baseline.run_test \
 ## 批量评测
 
 ```bash
+# 先查看训练集实际文件名
+ls /autodl-tmp/opensource_release_20260511/src/project_v2/data/porto/train*.npy
+
 python3 -m tpro_baseline.run_test_batch \
   --data_dir /autodl-tmp/opensource_release_20260511/src/project_v2/data/porto \
-  --train train_data_init.npy \
+  --train train_data_1.npy \
   --map_dir map
 ```
+
+若没有 `train_data_init.npy`，常见为 `train_data_1.npy`（与 `outliers_data_1_*` 对应）；脚本也会自动尝试匹配。
 
 或：`bash scripts/run_tpro_porto.sh`
 
