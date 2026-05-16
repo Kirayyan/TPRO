@@ -1,17 +1,4 @@
-"""
-用 TPRO 对已生成的异常轨迹做检测评测（PR-AUC，与 MST-OATD 一致）。
-
-只需三类文件：
-  1. 训练轨迹（正常，用于学习热门路径）
-  2. 测试轨迹（你已注入异常的数据，.npy object 数组）
-  3. 标签：outliers_idx（异常轨迹下标）或 0/1 标签向量
-
-示例：
-  python -m tpro_baseline.run_test \\
-    --train /path/to/train_data_init.npy \\
-    --test  /path/to/outliers_data_init_2_0.2_1.0.npy \\
-    --labels /path/to/outliers_idx_init_2_0.2_1.0.npy
-"""
+# TPRO detection + PR-AUC evaluation on pre-generated outlier npy files.
 
 from __future__ import annotations
 
@@ -115,7 +102,7 @@ def run(
     print(f"[test] edges {test_edges}: {len(test_routes)}")
   else:
     if not test_path:
-      raise ValueError("需要 --test 或 --test_edges")
+      raise ValueError("need --test or --test_edges")
     test_trajs = np.load(Path(test_path), allow_pickle=True)
     test_routes = match_routes(
         graph,
@@ -160,10 +147,10 @@ def run(
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
-  p = argparse.ArgumentParser(description="TPRO 检测评测（异常已生成，直接测试）")
-  p.add_argument("--train", required=True, help="训练 .npy 或配合 --train_edges")
-  p.add_argument("--test", default="", help="测试 .npy（outliers_data_*.npy）")
-  p.add_argument("--labels", required=True, help="outliers_idx 或 0/1 标签 .npy")
+  p = argparse.ArgumentParser(description="TPRO eval on pre-generated outliers")
+  p.add_argument("--train", required=True)
+  p.add_argument("--test", default="")
+  p.add_argument("--labels", required=True)
   p.add_argument("--map_dir", default="map")
   p.add_argument("--train_cache", default="")
   p.add_argument("--test_cache", default="")
