@@ -22,7 +22,7 @@ def main() -> int:
   p.add_argument("--data_dir", required=True)
   p.add_argument("--train", default="train_data_init.npy")
   p.add_argument("--pattern", default="outliers_data_*.npy")
-  p.add_argument("--map_dir", default="TPRO/map")
+  p.add_argument("--map_dir", default="map")
   p.add_argument("--train_cache", default=".tpro_cache/train.pkl")
   p.add_argument("--test_cache_dir", default=".tpro_cache/tests")
   p.add_argument("--lon_blocks", type=int, default=10)

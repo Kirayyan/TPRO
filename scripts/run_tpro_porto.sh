@@ -13,7 +13,7 @@ pip install -q -r requirements.txt
 #   --train  "${DATA_DIR}/train_data_init.npy" \
 #   --test   "${DATA_DIR}/outliers_data_1_stay_0p3_10_1.npy" \
 #   --labels "${DATA_DIR}/outliers_idx_1_stay_0p3_10_1.npy" \
-#   --map_dir TPRO/map \
+#   --map_dir map \
 #   --train_cache .tpro_cache/train.pkl \
 #   --test_cache  .tpro_cache/outliers_data_1_stay_0p3_10_1.pkl \
 #   --scores_out results/tpro_scores/outliers_data_1_stay_0p3_10_1_scores.npy
@@ -22,7 +22,7 @@ pip install -q -r requirements.txt
 python3 -m tpro_baseline.run_test_batch \
   --data_dir "$DATA_DIR" \
   --train train_data_init.npy \
-  --map_dir TPRO/map \
+  --map_dir map \
   --train_cache .tpro_cache/train.pkl \
   --test_cache_dir .tpro_cache/tests \
   --scores_dir results/tpro_scores

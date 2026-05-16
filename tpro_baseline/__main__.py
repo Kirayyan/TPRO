@@ -1,4 +1,4 @@
-from .eval_mst_oatd import main
+from .run_test import main
 
 if __name__ == "__main__":
   raise SystemExit(main())

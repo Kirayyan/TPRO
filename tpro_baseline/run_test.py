@@ -82,7 +82,7 @@ def run(
     train_path: Union[str, Path],
     test_path: Optional[Union[str, Path]],
     labels_path: Union[str, Path],
-    map_dir: Union[str, Path] = "TPRO/map",
+    map_dir: Union[str, Path] = "map",
     train_routes_cache: Optional[Union[str, Path]] = None,
     test_routes_cache: Optional[Union[str, Path]] = None,
     train_edges: Optional[Union[str, Path]] = None,
@@ -164,7 +164,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
   p.add_argument("--train", required=True, help="ÑµÁ· .npy »òÅäºÏ --train_edges")
   p.add_argument("--test", default="", help="²âÊÔ .npy£¨outliers_data_*.npy£©")
   p.add_argument("--labels", required=True, help="outliers_idx »ò 0/1 ±êÇ© .npy")
-  p.add_argument("--map_dir", default="TPRO/map")
+  p.add_argument("--map_dir", default="map")
   p.add_argument("--train_cache", default="")
   p.add_argument("--test_cache", default="")
   p.add_argument("--train_edges", default="")
