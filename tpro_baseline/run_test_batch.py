@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from .run_test import run
+from .run_test import load_model_cache, run
 
 
 def labels_path_for_test(test_path: Path) -> Path:
@@ -138,6 +138,8 @@ def main() -> int:
   print(f"dataset:  {args.dataset}, grid_only={grid_only}")
   print(f"tests:    {len(tests)}\n")
 
+  model_cache_path = Path(args.model_cache) if args.model_cache else None
+  shared_model = None
   results = []
   for test_path in tests:
     try:
