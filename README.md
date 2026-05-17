@@ -34,6 +34,22 @@ python3 -m tpro_baseline.run_test \
   --test_cache  .tpro_cache/test_stay.pkl
 ```
 
+## 一次命令只测指定的 3 组（或其它多组）
+
+```bash
+python3 -m tpro_baseline.run_test_batch \
+  --data_dir /root/autodl-tmp/.../data/porto \
+  --train train_data_init.npy \
+  --dataset porto --map_dir map \
+  --only \
+    1_speed_accelerate4_0p1_1 \
+    1_speed_decelerate4_0p4_1 \
+    1_stay_0p3_10_1 \
+  --scores_dir results/my_three
+```
+
+`--only` 可写短名（自动加 `outliers_data_` 前缀）或完整文件名。
+
 ## 批量评测
 
 ```bash

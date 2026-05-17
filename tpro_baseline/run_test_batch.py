@@ -77,9 +77,12 @@ def main() -> int:
     print(f"error: data_dir not found: {data_dir}", file=sys.stderr)
     return 1
 
-  tests = sorted(data_dir.glob(args.pattern))
+  tests = resolve_test_paths(data_dir, args.pattern, args.only)
   if not tests:
-    print(f"error: no files match {args.pattern} in {data_dir}", file=sys.stderr)
+    if args.only:
+      print("error: none of --only files exist", file=sys.stderr)
+    else:
+      print(f"error: no files match {args.pattern} in {data_dir}", file=sys.stderr)
     print("hint: ls", data_dir, file=sys.stderr)
     return 1
 
