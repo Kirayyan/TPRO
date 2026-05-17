@@ -12,11 +12,18 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tpro_baseline.map_graph import RoadGraph  # noqa: E402
-from tpro_baseline.run_test import MAP_AREA, save_model_cache  # noqa: E402
 from tpro_baseline.tpro import TPRO  # noqa: E402
 
 TPRO_MIN_LAT, TPRO_MAX_LAT = 41.140519, 41.175893
 TPRO_MIN_LON, TPRO_MAX_LON = -8.651993, -8.579304
+_D_LAT = TPRO_MAX_LAT - TPRO_MIN_LAT
+_D_LON = TPRO_MAX_LON - TPRO_MIN_LON
+MAP_AREA = (
+    TPRO_MIN_LAT - _D_LAT / 10,
+    TPRO_MAX_LAT + _D_LAT / 10,
+    TPRO_MIN_LON - _D_LON / 10,
+    TPRO_MAX_LON + _D_LON / 10,
+)
 
 
 def main() -> None:
@@ -26,7 +33,6 @@ def main() -> None:
 
   if not train_cache.exists():
     print(f"error: missing {train_cache}")
-    print("run porto train map-match first with --train_cache .tpro_cache/porto_train.pkl")
     sys.exit(1)
 
   print(f"load routes from {train_cache}")
@@ -52,8 +58,10 @@ def main() -> None:
   model.fit(train_routes)
   print(f"fit done ({time.time() - t0:.1f}s)")
 
-  save_model_cache(model_cache, model, grid_only=False)
-  print(f"done: {model_cache} ({model_cache.stat().st_size / 1e6:.1f} MB)")
+  model_cache.parent.mkdir(parents=True, exist_ok=True)
+  with model_cache.open("wb") as f:
+    pickle.dump({"grid_only": False, "model": model}, f)
+  print(f"saved -> {model_cache} ({model_cache.stat().st_size / 1e6:.1f} MB)")
 
 
 if __name__ == "__main__":
