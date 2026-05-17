@@ -61,6 +61,32 @@ requirements.txt
 scripts/
 ```
 
+## 成都（cd）— 不需要路网
+
+与 MST-OATD 一样在 **网格轨迹** 上跑 TPRO（`--dataset cd` 自动开启，无需 `map/`）：
+
+```bash
+DATA=/root/autodl-tmp/opensource_release_20260511/src/project_v2/data/cd
+
+python3 -m tpro_baseline.run_test_batch \
+  --data_dir ${DATA} \
+  --train train_data_init.npy \
+  --dataset cd \
+  --grid_only
+```
+
+单个文件：
+
+```bash
+python3 -m tpro_baseline.run_test \
+  --dataset cd --grid_only \
+  --train  ${DATA}/train_data_init.npy \
+  --test   ${DATA}/outliers_data_xxx.npy \
+  --labels ${DATA}/outliers_idx_xxx.npy
+```
+
+说明：这是 **网格版 TPRO**（与 MST-OATD 数据格式一致），不是路网 map-match 版；指标仍为 PR-AUC。
+
 ## 克隆建议（减小体积）
 
 ```bash

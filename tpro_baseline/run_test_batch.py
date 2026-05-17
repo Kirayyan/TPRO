@@ -61,6 +61,8 @@ def main() -> int:
   p.add_argument("--data_dir", required=True)
   p.add_argument("--train", default="train_data_init.npy")
   p.add_argument("--pattern", default="outliers_data_*.npy")
+  p.add_argument("--dataset", default="porto", choices=("porto", "cd"))
+  p.add_argument("--grid_only", action="store_true", help="no road map; required for cd")
   p.add_argument("--map_dir", default="map")
   p.add_argument("--train_cache", default=".tpro_cache/train.pkl")
   p.add_argument("--test_cache_dir", default=".tpro_cache/tests")
@@ -71,21 +73,25 @@ def main() -> int:
   args = p.parse_args()
 
   data_dir = Path(args.data_dir)
-  train_path = data_dir / args.train
-  if not train_path.exists():
-    for alt in ("train_data_1.npy", "train_data_init.npy"):
-      cand = data_dir / alt
-      if cand.exists():
-        train_path = cand
-        print(f"[train] using {train_path}")
-        break
-    else:
-      print(f"error: train file not found under {data_dir}", file=sys.stderr)
-      return 1
+  if not data_dir.is_dir():
+    print(f"error: data_dir not found: {data_dir}", file=sys.stderr)
+    return 1
 
   tests = sorted(data_dir.glob(args.pattern))
   if not tests:
     print(f"error: no files match {args.pattern} in {data_dir}", file=sys.stderr)
+    print("hint: ls", data_dir, file=sys.stderr)
+    return 1
+
+  train_path = resolve_train_path(data_dir, args.train, tests)
+  if not train_path.exists():
+    print(f"error: train file not found under {data_dir}", file=sys.stderr)
+    print("available .npy files:", file=sys.stderr)
+    for p in sorted(data_dir.glob("*.npy"))[:30]:
+      print(f"  {p.name}", file=sys.stderr)
+    if len(list(data_dir.glob("*.npy"))) > 30:
+      print("  ...", file=sys.stderr)
+    print("fix: pass --train <actual_train_file.npy>", file=sys.stderr)
     return 1
 
   cache_train = Path(args.train_cache)
@@ -93,8 +99,10 @@ def main() -> int:
   scores_dir = Path(args.scores_dir)
   scores_dir.mkdir(parents=True, exist_ok=True)
 
+  grid_only = args.grid_only or args.dataset == "cd"
   print(f"data_dir: {data_dir}")
   print(f"train:    {train_path}")
+  print(f"dataset:  {args.dataset}, grid_only={grid_only}")
   print(f"tests:    {len(tests)}\n")
 
   results = []
@@ -121,6 +129,8 @@ def main() -> int:
           train_path=train_path,
           test_path=test_path,
           labels_path=label_path,
+          dataset=args.dataset,
+          grid_only=grid_only,
           map_dir=args.map_dir,
           train_routes_cache=cache_train,
           test_routes_cache=test_cache,
