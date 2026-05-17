@@ -56,15 +56,45 @@ def resolve_train_path(data_dir: Path, train_arg: str, test_files: list[Path]) -
   return explicit
 
 
+def resolve_test_paths(data_dir: Path, pattern: str, only: list[str] | None) -> list[Path]:
+  if not only:
+    return sorted(data_dir.glob(pattern))
+
+  tests: list[Path] = []
+  for raw in only:
+    name = raw.strip()
+    if not name.endswith(".npy"):
+      if not name.startswith("outliers_data_"):
+        name = f"outliers_data_{name}"
+      name = f"{name}.npy"
+    path = data_dir / name
+    if path.exists():
+      tests.append(path)
+    else:
+      print(f"warning: not found, skip: {path}", file=sys.stderr)
+  return tests
+
+
 def main() -> int:
   p = argparse.ArgumentParser(description="Batch TPRO eval on porto outlier npy files")
   p.add_argument("--data_dir", required=True)
   p.add_argument("--train", default="train_data_init.npy")
+  p.add_argument(
+      "--only",
+      nargs="+",
+      default=None,
+      help="exact test files to run, e.g. 1_speed_accelerate4_0p1_1 outliers_data_1_stay_....npy",
+  )
   p.add_argument("--pattern", default="outliers_data_*.npy")
   p.add_argument("--dataset", default="porto", choices=("porto", "cd"))
   p.add_argument("--grid_only", action="store_true", help="no road map; required for cd")
   p.add_argument("--map_dir", default="map")
   p.add_argument("--train_cache", default=".tpro_cache/train.pkl")
+  p.add_argument(
+      "--model_cache",
+      default="",
+      help="save/load fitted model; reuse across --only tests in one run",
+  )
   p.add_argument("--test_cache_dir", default=".tpro_cache/tests")
   p.add_argument("--lon_blocks", type=int, default=10)
   p.add_argument("--lat_blocks", type=int, default=20)
@@ -128,7 +158,7 @@ def main() -> int:
     score_out = scores_dir / f"{stem}_scores.npy"
 
     try:
-      auc = run(
+      auc, shared_model = run(
           train_path=train_path,
           test_path=test_path,
           labels_path=label_path,
@@ -137,6 +167,8 @@ def main() -> int:
           map_dir=args.map_dir,
           train_routes_cache=cache_train,
           test_routes_cache=test_cache,
+          model_cache=model_cache_path if shared_model is None else None,
+          model=shared_model,
           lon_blocks=args.lon_blocks,
           lat_blocks=args.lat_blocks,
           top_k=args.top_k,
